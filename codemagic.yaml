@@ -27,6 +27,12 @@ workflows:
           echo "Checking software versions installed in Apple runner environment:"
           xcodebuild -version
           java -version
+          
+          # Forcefully retrieve a non-corrupted standard gradle-wrapper.jar
+          echo "Restoring clean Gradle wrapper executable..."
+          mkdir -p gradle/wrapper
+          curl -Lo gradle/wrapper/gradle-wrapper.jar https://raw.githubusercontent.com/gradle/gradle/v8.5.0/gradle/wrapper/gradle-wrapper.jar
+          
           chmod +x gradlew
           ./gradlew --version
       - name: Build Shared Kotlin Multiplatform Engine
