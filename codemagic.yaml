@@ -43,19 +43,14 @@ workflows:
         script: |
           echo "Compiling swift sources and building corporate application bundle..."
           
-          # Initialize directory locations for build artifacts
-          mkdir -p build/ios/ipa
-          
           # Compile the scheme using xcodebuild (configured for simulator or ad-hoc test compilation)
-          # We use "sdk iphonesimulator" to build a simulator release app (.app bundle)
-          # which is easy to test or run, or ad-hoc builds if they supply credentials.
-          # To ensure maximum compatibility for code verification, we execute an archive build
-          # with code signing disabled so it succeeds universally without needing a paid Apple Developer Provisioning profile uploaded first. 
+          # We force outputs into 'build' using -derivedDataPath so we can find and package the app.
           xcodebuild \
             -project "$XCODE_PROJECT" \
             -scheme "$XCODE_SCHEME" \
             -sdk iphoneos \
             -configuration Release \
+            -derivedDataPath build \
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGN_IDENTITY="" \
@@ -63,9 +58,25 @@ workflows:
             clean build
             
           echo "iOS bundle compiled successfully under simulated sandbox signing."
+          
+          # Find the compiled .app file and package it into a zip-based .ipa for easy download
+          echo "Packaging application bundle..."
+          APP_PATH=$(find build -name "*.app" -type d | head -n 1)
+          if [ -n "$APP_PATH" ]; then
+            echo "Found compiled app at: $APP_PATH"
+            mkdir -p build/ios/Payload
+            cp -R "$APP_PATH" build/ios/Payload/
+            cd build/ios
+            zip -r CorpReminder.ipa Payload
+            cd ../..
+            echo "Successfully packaged CorpReminder.ipa!"
+          else
+            echo "Error: Could not locate compiled .app file!"
+            exit 1
+          fi
     artifacts:
-      - iosApp/build/Release-iphoneos/*.app
-      - build/ios/ipa/*.ipa
+      - build/Build/Products/Release-iphoneos/*.app
+      - build/ios/*.ipa
     publishing:
       email:
         recipients:
