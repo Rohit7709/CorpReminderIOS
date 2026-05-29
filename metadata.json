@@ -1,0 +1,8 @@
+{
+  "name": "Remix: CorpRemind",
+  "description": "Daily and schedule-based Task Reminder app for corporate employees with functional admin portals.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
