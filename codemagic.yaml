@@ -27,6 +27,7 @@ workflows:
           echo "Checking software versions installed in Apple runner environment:"
           xcodebuild -version
           java -version
+          chmod +x gradlew
           ./gradlew --version
       - name: Build Shared Kotlin Multiplatform Engine
         script: |
