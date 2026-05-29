@@ -28,6 +28,10 @@ workflows:
           xcodebuild -version
           java -version
           
+          # Regenerate gradle wrapper natively to guarantee a non-corrupted binary jar file
+          echo "Generating clean Gradle 9.3.1 wrapper..."
+          gradle wrapper --gradle-version 9.3.1
+          
           chmod +x gradlew
           ./gradlew --version
       - name: Build Shared Kotlin Multiplatform Engine
